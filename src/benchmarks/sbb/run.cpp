@@ -53,6 +53,8 @@ int main(int argc, char* argv[]) {
    bool clearCaches = false;
    if (argc > 3) nrThreads = atoi(argv[3]);
 
+   std::cout << "Threads is: " << nrThreads << std::endl;
+
 
    std::unordered_set<std::string> q = {
        "1.1h", "1.1v", "1.2h", "1.2v", "1.3h", "1.3v", "2.1h", "2.1v", "2.2h",
@@ -73,37 +75,50 @@ int main(int argc, char* argv[]) {
      copy(istream_iterator<string>(iss), istream_iterator<string>(),
           insert_iterator<decltype(q)>(q, q.begin()));
    }
+   std::cout << "clearCaches: " << clearCaches << std::endl;
 
    tbb::task_scheduler_init scheduler(nrThreads);
-   if (q.count("1.1h")) e.timeAndProfile("q1.1 hyper     ", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q11_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("1.1v")) e.timeAndProfile("q1.1 vectorwise", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q11_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
-   if (q.count("1.2h")) e.timeAndProfile("q1.2 hyper     ", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q12_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("1.2v")) e.timeAndProfile("q1.2 vectorwise", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q12_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
-   if (q.count("1.3h")) e.timeAndProfile("q1.3 hyper     ", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q13_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("1.3v")) e.timeAndProfile("q1.3 vectorwise", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q13_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   e.timeAndProfile("count_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = count_hyper(ssb, nrThreads); escape(&result);}, repetitions);
 
-   if (q.count("2.1h")) e.timeAndProfile("q2.1 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q21_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("2.1v")) e.timeAndProfile("q2.1 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q21_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
-   if (q.count("2.2h")) e.timeAndProfile("q2.2 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q22_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("2.2v")) e.timeAndProfile("q2.2 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q22_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
-   if (q.count("2.3h")) e.timeAndProfile("q2.3 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q23_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("2.3v")) e.timeAndProfile("q2.3 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q23_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   e.timeAndProfile("count_if_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = count_if_hyper(ssb, nrThreads); escape(&result);}, repetitions);
 
-   if (q.count("3.1h")) e.timeAndProfile("q3.1 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q31_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("3.1v")) e.timeAndProfile("q3.1 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q31_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
-   if (q.count("3.2h")) e.timeAndProfile("q3.2 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q32_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("3.2v")) e.timeAndProfile("q3.2 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q32_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
-   if (q.count("3.3h")) e.timeAndProfile("q3.3 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q33_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("3.3v")) e.timeAndProfile("q3.3 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q33_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
-   if (q.count("3.3h")) e.timeAndProfile("q3.4 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q34_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("3.3v")) e.timeAndProfile("q3.4 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q34_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   e.timeAndProfile("sum_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_hyper(ssb, nrThreads); escape(&result);}, repetitions);
 
-   if (q.count("4.1h")) e.timeAndProfile("q4.1 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q41_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("4.1v")) e.timeAndProfile("q4.1 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q41_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
-   if (q.count("4.2h")) e.timeAndProfile("q4.2 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q42_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("4.2v")) e.timeAndProfile("q4.2 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q42_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
-   if (q.count("4.3h")) e.timeAndProfile("q4.3 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q43_hyper(ssb, nrThreads); escape(&result);}, repetitions);
-   if (q.count("4.3v")) e.timeAndProfile("q4.3 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q43_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   e.timeAndProfile("sum3_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum3_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+
+   e.timeAndProfile("sum_group_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+
+   e.timeAndProfile("sum_group2_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group2_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+
+   //if (q.count("1.1h")) e.timeAndProfile("q1.1 hyper     ", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q11_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("1.1v")) e.timeAndProfile("q1.1 vectorwise", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q11_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   // if (q.count("1.2h")) e.timeAndProfile("q1.2 hyper     ", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q12_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("1.2v")) e.timeAndProfile("q1.2 vectorwise", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q12_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   // if (q.count("1.3h")) e.timeAndProfile("q1.3 hyper     ", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q13_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("1.3v")) e.timeAndProfile("q1.3 vectorwise", nrTuples(ssb, {"date", "lineorder"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q13_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+
+   // if (q.count("2.1h")) e.timeAndProfile("q2.1 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q21_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("2.1v")) e.timeAndProfile("q2.1 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q21_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   // if (q.count("2.2h")) e.timeAndProfile("q2.2 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q22_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("2.2v")) e.timeAndProfile("q2.2 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q22_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   // if (q.count("2.3h")) e.timeAndProfile("q2.3 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q23_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("2.3v")) e.timeAndProfile("q2.3 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q23_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+
+   // if (q.count("3.1h")) e.timeAndProfile("q3.1 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q31_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("3.1v")) e.timeAndProfile("q3.1 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q31_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   // if (q.count("3.2h")) e.timeAndProfile("q3.2 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q32_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("3.2v")) e.timeAndProfile("q3.2 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q32_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   // if (q.count("3.3h")) e.timeAndProfile("q3.3 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q33_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("3.3v")) e.timeAndProfile("q3.3 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q33_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   // if (q.count("3.3h")) e.timeAndProfile("q3.4 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q34_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("3.3v")) e.timeAndProfile("q3.4 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q34_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+
+   // if (q.count("4.1h")) e.timeAndProfile("q4.1 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q41_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("4.1v")) e.timeAndProfile("q4.1 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q41_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   // if (q.count("4.2h")) e.timeAndProfile("q4.2 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q42_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("4.2v")) e.timeAndProfile("q4.2 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q42_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
+   // if (q.count("4.3h")) e.timeAndProfile("q4.3 hyper     ", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q43_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // if (q.count("4.3v")) e.timeAndProfile("q4.3 vectorwise", nrTuples(ssb, {"date", "lineorder", "supplier", "customer", "part"}), [&]() { if(clearCaches) clearOsCaches(); auto result = q43_vectorwise(ssb, nrThreads, vectorSize); escape(&result);}, repetitions);
 
    return 0;
 }

@@ -1,4 +1,5 @@
 #include "common/Compat.hpp"
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <functional>
@@ -270,62 +271,65 @@ size_t getCurrentRSS() {
 void PerfEvents::timeAndProfile(std::string s, uint64_t count,
                                 std::function<void()> fn, uint64_t repetitions,
                                 bool mem) {
+   std::cout << "repetitions is " << repetitions << std::endl;
    using namespace std;
    // warmup round
-   double warumupStart = gettime();
-   while (gettime() - warumupStart < 0.15) fn();
-
-   uint64_t memStart = 0;
-   if (mem) memStart = getCurrentRSS();
-   startAll();
-   double start = gettime();
-   size_t performedRep = 0;
-   for (; performedRep < repetitions || gettime() - start < 0.5;
-        ++performedRep) {
+   int warumupCount = 3;
+   while (warumupCount-- > 0) {
       fn();
    }
-   double end = gettime();
-   readAll();
-   std::cout.precision(3);
-   std::cout.setf(std::ios::fixed, std::ios::floatfield);
-   if (writeHeader) {
-      std::cout << setw(20) << "name"
-                << "," << setw(printFieldWidth) << " time"
-                << "," << setw(printFieldWidth) << " CPUs"
-                << "," << setw(printFieldWidth) << " IPC"
-                << "," << setw(printFieldWidth) << " GHz"
-                << "," << setw(printFieldWidth) << " Bandwidth"
-                << ",";
-      printHeader(std::cout);
-      std::cout << std::endl;
-   }
 
-   auto runtime = end - start;
-   std::cout << setw(20) << s << "," << setw(printFieldWidth)
-             << (runtime * 1e3 / performedRep) << ",";
-#ifdef __linux__
-   if (!getenv("EXTERNALPROFILE")) {
-      std::cout << setw(printFieldWidth)
-                << ((*this)["task-clock"] / (runtime * 1e9)) << ",";
-      std::cout << setw(printFieldWidth)
-                << ((*this)["instr."] / (*this)["cycles"]) << ",";
-      std::cout << setw(printFieldWidth)
-                << ((*this)["cycles"] /
-                    (this->events["cycles"][0].data.time_enabled -
-                     this->events["cycles"][0].prev.time_enabled))
-                << ",";
-      std::cout << setw(printFieldWidth)
-                << ((((*this)["all_rd"] * 64.0) / (1024 * 1024)) /
-                    (end - start))
-                << ",";
+   // uint64_t memStart = 0;
+   // if (mem) memStart = getCurrentRSS();
+   // startAll();
+   auto start = chrono::high_resolution_clock::now();
+   size_t performedRep = 0;
+   for (; performedRep < repetitions; ++performedRep) {
+      fn();
    }
-#endif
+   auto end = chrono::high_resolution_clock::now();
+   // readAll();
+   // std::cout.precision(3);
+   // std::cout.setf(std::ios::fixed, std::ios::floatfield);
+   // if (writeHeader) {
+   //    std::cout << setw(20) << "name"
+   //              << "," << setw(printFieldWidth) << " time"
+   //              << "," << setw(printFieldWidth) << " CPUs"
+   //              << "," << setw(printFieldWidth) << " IPC"
+   //              << "," << setw(printFieldWidth) << " GHz"
+   //              << "," << setw(printFieldWidth) << " Bandwidth"
+   //              << ",";
+   //    printHeader(std::cout);
+   //    std::cout << std::endl;
+   // }
+
+   auto runtime = static_cast<uint64_t>(chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+   std::cout << "runtime is " << runtime << std::endl;
+   std::cout << "performedRep is " << performedRep << std::endl;
+   std::cout << setw(20) << s << "," << setw(printFieldWidth) << (runtime  / performedRep) << std::endl;
+// #ifdef __linux__
+//    if (!getenv("EXTERNALPROFILE")) {
+//       std::cout << setw(printFieldWidth)
+//                 << ((*this)["task-clock"] / (runtime * 1e9)) << ",";
+//       std::cout << setw(printFieldWidth)
+//                 << ((*this)["instr."] / (*this)["cycles"]) << ",";
+//       std::cout << setw(printFieldWidth)
+//                 << ((*this)["cycles"] /
+//                     (this->events["cycles"][0].data.time_enabled -
+//                      this->events["cycles"][0].prev.time_enabled))
+//                 << ",";
+//       std::cout << setw(printFieldWidth)
+//                 << ((((*this)["all_rd"] * 64.0) / (1024 * 1024)) /
+//                     (end - start))
+//                 << ",";
+//    }
+// #endif
    // std::cout <<
    // (((e["all_requests"]*64.0)/(1024*1024))/(e.events["cycles"][0].data.time_enabled/1e9))
    // << " allMB/s,";
 
-   printAll(std::cout, count * performedRep);
-   if (mem) std::cout << (getCurrentRSS() - memStart) / (1024.0 * 1024) << "MB";
+   // printAll(std::cout, count * performedRep);
+   // if (mem) std::cout << (getCurrentRSS() - memStart) / (1024.0 * 1024) << "MB";
    std::cout << std::endl;
    writeHeader = false;
 }

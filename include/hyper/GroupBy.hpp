@@ -110,7 +110,7 @@ class GroupBy {
       return Locals(*this, g, e, spillStorage, maxFill);
    }
    /// Spill all
-   void spillAll() {
+   void  spillAll() {
       tbb::parallel_for(entries.range(), [&](const auto& e) {
 
          bool exists;

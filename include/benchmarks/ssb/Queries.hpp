@@ -38,6 +38,31 @@ struct Q11Builder : public vectorwise::QueryBuilder {
 };
 
 std::unique_ptr<runtime::Query>
+count_hyper(runtime::Database& db,
+          size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+count_if_hyper(runtime::Database& db,
+          size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum_hyper(runtime::Database& db,
+          size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum3_hyper(runtime::Database& db,
+          size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum_group_hyper(runtime::Database& db,
+          size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum_group2_hyper(runtime::Database& db,
+          size_t nrThreads = std::thread::hardware_concurrency());
+
+
+std::unique_ptr<runtime::Query>
 q11_hyper(runtime::Database& db,
           size_t nrThreads = std::thread::hardware_concurrency());
 std::unique_ptr<runtime::Query>
