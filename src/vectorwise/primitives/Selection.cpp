@@ -18,6 +18,9 @@ namespace primitives {
 #define MK_SEL_COLVAL(type, op)                                                \
    F3 sel_##op##_##type##_col_##type##_val = (F3)&sel_col_val<type, op>;
 
+#define MK_SEL_COL(type)                                                \
+   F3 sel_##type##_col = (F3)&sel_col<type>;
+
 #define MK_SEL_COLVALORVAL(type, op)                                           \
    F4 sel_##op##_##type##_col_##type##_val_or_##type##_val =                   \
        (F4)&sel_col_val_or_val<type, op>;
@@ -52,6 +55,8 @@ EACH_COMP(EACH_TYPE, MK_SEL_COLCOL_BF)
 EACH_COMP(EACH_TYPE, MK_SEL_COLVAL_BF)    // with second arg const
 EACH_COMP(EACH_TYPE, MK_SELSEL_COLCOL_BF) // with input selection vector
 EACH_COMP(EACH_TYPE, MK_SELSEL_COLVAL_BF) // with above and second arg const
+
+EACH_TYPE(NIL, MK_SEL_COL)
 
 template <typename T> struct Contains {
    bool operator()(const T& haystack, const T& needle) {

@@ -12,6 +12,38 @@
 
 namespace ssb {
 
+std::unique_ptr<runtime::Query>
+count_hyper(runtime::Database& db,
+            size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+count_if_hyper(runtime::Database& db,
+               size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum_hyper(runtime::Database& db,
+         size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum3_hyper(runtime::Database& db,
+         size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum_group_hyper(runtime::Database& db,
+               size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum_group_phmap(runtime::Database& db,
+               size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum_group2_hyper(runtime::Database& db,
+               size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum_group2_phmap(runtime::Database& db,
+               size_t nrThreads = std::thread::hardware_concurrency());
+
 struct Q11Builder : public vectorwise::QueryBuilder {
    enum {
       sel_year,
@@ -19,7 +51,9 @@ struct Q11Builder : public vectorwise::QueryBuilder {
       sel_discount_low,
       sel_discount_high,
       join_result,
-      result_project
+      result_project,
+      count_lo_orderkey,
+      sum_revenue
    };
    struct Q11 {
       types::Integer year = types::Integer(1993);
@@ -37,6 +71,7 @@ struct Q11Builder : public vectorwise::QueryBuilder {
    std::unique_ptr<Q11> getQuery();
 };
 
+
 std::unique_ptr<runtime::Query>
 q11_hyper(runtime::Database& db,
           size_t nrThreads = std::thread::hardware_concurrency());
@@ -53,7 +88,9 @@ struct Q12Builder : public vectorwise::QueryBuilder {
       sel_discount_low,
       sel_discount_high,
       join_result,
-      result_project
+      result_project,
+      filter,
+      count
    };
    struct Q12 {
       types::Integer yearmonthnum = types::Integer(199401);
@@ -65,6 +102,7 @@ struct Q12Builder : public vectorwise::QueryBuilder {
       types::Integer quantity_min = types::Integer(26);
       int64_t aggregator = 0;
       std::unique_ptr<vectorwise::Operator> rootOp;
+      types::Integer year_min = types::Integer(19920101);
    };
    Q12Builder(runtime::Database& db, vectorwise::SharedStateManager& shared,
               size_t size = 1024)
@@ -89,7 +127,8 @@ struct Q13Builder : public vectorwise::QueryBuilder {
       sel_discount_low,
       sel_discount_high,
       join_result,
-      result_project
+      result_project,
+      sum_revenue
    };
    struct Q13 {
       types::Integer year = types::Integer(1994);
@@ -130,12 +169,16 @@ struct Q21Builder : public vectorwise::QueryBuilder {
       lineorder_date,
       p_brand1,
       sum_revenue,
-      d_year
+      d_year,
+      sum_extend,
+      sum_total
    };
    struct Q21 {
       types::Char<7> category = types::Char<7>::castString("MFGR#12");
       types::Char<12> region = types::Char<12>::castString("AMERICA");
-
+      int64_t sum_revenue = 0;
+      int64_t sum_extend = 0;
+      int64_t sum_total = 0;
       std::unique_ptr<vectorwise::Operator> rootOp;
    };
    Q21Builder(runtime::Database& db, vectorwise::SharedStateManager& shared,
@@ -166,7 +209,8 @@ struct Q22Builder : public vectorwise::QueryBuilder {
       lineorder_date,
       p_brand1,
       sum_revenue,
-      d_year
+      d_year,
+      lo_shopmode
    };
    struct Q22 {
       types::Char<9> brand_min = types::Char<9>::castString("MFGR#2221");
@@ -202,12 +246,16 @@ struct Q23Builder : public vectorwise::QueryBuilder {
       lineorder_date,
       p_brand1,
       sum_revenue,
-      d_year
+      d_year,
+      orderdate,
+      orderdate_filter,
+      orderdate_result,
+      shopmode
    };
    struct Q23 {
       types::Char<9> brand = types::Char<9>::castString("MFGR#2221");
       types::Char<12> region = types::Char<12>::castString("EUROPE");
-
+      types::Integer year_min = types::Integer(0);
       std::unique_ptr<vectorwise::Operator> rootOp;
    };
    Q23Builder(runtime::Database& db, vectorwise::SharedStateManager& shared,

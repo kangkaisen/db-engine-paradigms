@@ -25,6 +25,16 @@ pos_t sel_col_val(pos_t n, pos_t* RES result, T* RES param1, T* RES param2)
    return found;
 }
 
+template <typename T>
+pos_t sel_col(pos_t n, T* RES result, T* RES param1, T* RES param2)
+/// select column
+{
+   for (uint64_t i = 0; i < n; ++i)  {
+      result[i] = param1[i];
+   }
+   return n;
+}
+
 template <typename T, template <typename> class Op>
 pos_t sel_col_val_or_val(pos_t n, pos_t* RES result, T* RES param1,
                          T* RES param2, T* RES param3)
@@ -267,6 +277,8 @@ pos_t aggr_static_col(pos_t n, T* RES result, T* RES param1)
 {
    auto aggregator = *result;
    for (uint64_t i = 0; i < n; ++i) aggregator = Op<T>()(param1[i], aggregator);
+   // std::cout <<  "aggregator " << aggregator << std::endl;
+   // std::cout <<  "param1 0 " << param1[0] << std::endl;
    *result = aggregator;
    return n > 0;
 }
@@ -1131,6 +1143,8 @@ using Varchar_55 = types::Varchar<55>;
 
 #define NIL(t, m) m(t)
 
+#define MK_SEL_COL_DECL(type)                                           \
+   extern F3 sel_##type##_col;
 #define MK_SEL_COLCOL_DECL(type, op)                                           \
    extern F3 sel_##op##_##type##_col_##type##_col;
 #define MK_SEL_COLVAL_DECL(type, op)                                           \
@@ -1245,7 +1259,10 @@ EACH_ARITH(EACH_TYPE_FULL, MK_AGGR_SEL_COL_DECL)
 EACH_ARITH(EACH_TYPE_FULL, MK_AGGR_ROW_DECL)
 EACH_ARITH(EACH_TYPE_FULL, MK_AGGR_INIT_DECL)
 extern F1 aggr_static_count_star;
+extern F2 aggr_static_count_int64;
 extern FAggr aggr_count_star;
+
+EACH_TYPE(NIL, MK_SEL_COL_DECL)
 
 EACH_TYPE(NIL, MK_HASH_DECL)
 EACH_TYPE(NIL, MK_HASH_SEL_DECL)

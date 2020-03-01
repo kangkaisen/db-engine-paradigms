@@ -342,6 +342,8 @@ bool Char<maxLen>::operator>=(const Char& other) const
    if (c > 0) return true;
    return len >= other.len;
 }
+
+
 //---------------------------------------------------------------------------
 /// A fixed length string
 template <> class Char<1> {
@@ -891,9 +893,11 @@ template <> struct hash<types::Char<1>> {
 };
 template <unsigned n> struct hash<types::Char<n>> {
    size_t operator()(types::Char<n> ch) const noexcept {
-      return std::hash<std::string>{}(std::string(ch.value, ch.len));
+      //return std::hash<std::string>{}(std::string(ch.value, ch.len));
+      return ch.value[0];
    }
 };
+
 } // namespace std
 //---------------------------------------------------------------------------
 #endif

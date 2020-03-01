@@ -100,62 +100,15 @@ NOVECTORIZE std::unique_ptr<runtime::Query> q13_hyper(Database& db,
    return std::move(resources.query);
 }
 
+// select sum(LO_REVENUE) from lineorder;
 std::unique_ptr<Q13Builder::Q13> Q13Builder::getQuery() {
    using namespace vectorwise;
-
    auto r = make_unique<Q13>();
-   auto date = Scan("date");
-   // select d_yearmonthnum = 199401
-   Select(Expression()
-              .addOp(BF(primitives::sel_equal_to_int32_t_col_int32_t_val),
-                     Buffer(sel_year, sizeof(pos_t)), Column(date, "d_year"),
-                     Value(&r->year))
-              .addOp(BF(primitives::selsel_equal_to_int32_t_col_int32_t_val),
-                     Buffer(sel_year, sizeof(pos_t)),
-                     Buffer(sel_week, sizeof(pos_t)),
-                     Column(date, "d_weeknuminyear"),
-                     Value(&r->weeknuminyear)));
-
    auto lineorder = Scan("lineorder");
-   // select lo_discount between 1 and 3, lo_quantity between 26 and 35
-   Select(
-       Expression()
-           .addOp(BF(primitives::sel_less_equal_int32_t_col_int32_t_val),
-                  Buffer(sel_qty_high, sizeof(pos_t)),
-                  Column(lineorder, "lo_quantity"), Value(&r->quantity_max))
-           .addOp(BF(primitives::selsel_greater_equal_int32_t_col_int32_t_val),
-                  Buffer(sel_qty_high, sizeof(pos_t)),
-                  Buffer(sel_qty_low, sizeof(pos_t)),
-                  Column(lineorder, "lo_quantity"), Value(&r->quantity_min))
-           .addOp(BF(primitives::selsel_greater_equal_int64_t_col_int64_t_val),
-                  Buffer(sel_qty_low, sizeof(pos_t)),
-                  Buffer(sel_discount_low, sizeof(pos_t)),
-                  Column(lineorder, "lo_discount"), Value(&r->discount_min))
-           .addOp(BF(primitives::selsel_less_equal_int64_t_col_int64_t_val),
-                  Buffer(sel_discount_low, sizeof(pos_t)),
-                  Buffer(sel_discount_high, sizeof(pos_t)),
-                  Column(lineorder, "lo_discount"), Value(&r->discount_max)));
-
-   HashJoin(Buffer(join_result, sizeof(pos_t)), conf.joinAll())
-       .setProbeSelVector(Buffer(sel_discount_high), conf.joinSel())
-       .addBuildKey(Column(date, "d_datekey"), Buffer(sel_week),
-                    conf.hash_sel_int32_t_col(),
-                    primitives::scatter_sel_int32_t_col)
-       .addProbeKey(Column(lineorder, "lo_orderdate"),
-                    Buffer(sel_discount_high), conf.hash_sel_int32_t_col(),
-                    primitives::keys_equal_int32_t_col);
-
-   Project().addExpression(Expression().addOp(
-       primitives::proj_sel_both_multiplies_int64_t_col_int64_t_col,
-       Buffer(join_result), Buffer(result_project, sizeof(int64_t)),
-       Column(lineorder, "lo_extendedprice"),
-       Column(lineorder, "lo_discount")));
-
    FixedAggregation(Expression().addOp(primitives::aggr_static_plus_int64_t_col,
                                        Value(&r->aggregator),
-                                       Buffer(result_project)));
+                                       Column(lineorder, "lo_revenue")));
    r->rootOp = popOperator();
-   assert(operatorStack.size() == 0);
    return r;
 }
 
@@ -189,6 +142,7 @@ std::unique_ptr<runtime::Query> q13_vectorwise(Database& db, size_t nrThreads,
             auto block = result->result->createBlock(1);
             int64_t* revenue = static_cast<int64_t*>(block.data(attribute));
             *revenue = aggr.load();
+            std::cout <<  "sum_vector result " << *revenue << std::endl;
             block.addedElements(1);
          }
       }

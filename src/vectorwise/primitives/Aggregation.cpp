@@ -31,6 +31,18 @@ pos_t aggr_static_count_star_(pos_t n, int64_t* RES result)
 }
 F1 aggr_static_count_star = (F1)&aggr_static_count_star_;
 
+
+pos_t aggr_static_count_int64_(pos_t n, int64_t* RES result, int32_t* RES param1)
+/// aggregate column into single value
+{
+   auto aggregator = *result;
+   for (uint64_t i = 0; i < n; ++i) aggregator += 1;
+   *result = aggregator;
+   return n > 0;
+}
+
+F2 aggr_static_count_int64 = (F2)&aggr_static_count_int64_;
+
 pos_t aggr_count_star_(pos_t n, int64_t* RES entries[], void* RES /*param1*/,
                        size_t offset)
 /// update count aggregates for each entry pointed to by entries

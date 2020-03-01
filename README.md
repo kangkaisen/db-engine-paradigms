@@ -2,10 +2,10 @@
 This repository contains a collection of experiments, conducted to carve out the differences between two types of query processing engines: Vectorizing (interpretation based) engines and compiling engines.
 
 ## Where to Start
-Have a look at src/benchmarks/tpch/queries/ to see how query processing for Typer and Tectorwise works. 
+Have a look at src/benchmarks/tpch/queries/ to see how query processing for Typer and Tectorwise works.
 
 ## How to Build
-A configuration file is provided to build this project with CMake. 
+A configuration file is provided to build this project with CMake.
 In the project directory run:
 ```
 mkdir -p build/release
