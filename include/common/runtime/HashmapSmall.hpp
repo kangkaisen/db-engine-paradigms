@@ -37,18 +37,23 @@ class HashmapSmall
    ref maxCapacity;
 
  public:
+
    HashmapSmall(size_t size) {
       size_t exp = 64 - __builtin_clzll(size);
       assert(exp < sizeof(hash_t) * 8);
       if (((size_t)1 << exp) < size / loadFactor) exp++;
-      maxCapacity = ((size_t)1) << exp;
-      capacity = std::min((ref)256, maxCapacity);
+      //maxCapacity = ((size_t)1) << exp;
+      maxCapacity = 8192;
+      capacity = std::min((ref)8192, maxCapacity);
       capLimit = capacity * loadFactor;
       mask = capacity - 1;
       entries = new ref[maxCapacity];
       storage = new Entry[size];
       clearByMemset();
    }
+
+   HashmapSmall(): HashmapSmall(16) {}
+
    ~HashmapSmall() {
       delete[] entries;
       delete[] storage;
@@ -73,6 +78,17 @@ class HashmapSmall
          if (comp(candPtr->key)) return &candPtr->value;
       return nullptr;
    }
+
+   V* find(K& key, hash_t& hash) {
+      auto cand = entries[hash & mask];
+      if (cand == empty) return nullptr;
+      for (auto candPtr = &storage[cand]; cand != empty;
+           cand = candPtr->next, candPtr = &storage[cand]) {
+         if (key == candPtr->key) return &candPtr->value;
+      }
+      return nullptr;
+   }
+
    void insert(K& key, hash_t& hash, V& value) {
       // calculate spot in directory
       auto& dir = entries[hash & mask];
@@ -106,6 +122,15 @@ class HashmapSmall
             dir = i;
          }
       }
+   }
+
+   void insert_or_update(K key, hash_t hash, V value) {
+         auto el = find(key, hash);
+         if (el) {
+            (*el) += value;
+         } else {
+            insert(key, hash, value);
+         }
    }
 
    Entry* begin() { return storage; }

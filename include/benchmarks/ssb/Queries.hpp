@@ -25,6 +25,10 @@ sum_hyper(runtime::Database& db,
          size_t nrThreads = std::thread::hardware_concurrency());
 
 std::unique_ptr<runtime::Query>
+sum_func_hyper(runtime::Database& db,
+         size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
 sum3_hyper(runtime::Database& db,
          size_t nrThreads = std::thread::hardware_concurrency());
 
@@ -34,6 +38,14 @@ sum_group_hyper(runtime::Database& db,
 
 std::unique_ptr<runtime::Query>
 sum_group_phmap(runtime::Database& db,
+               size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum_group_int_phmap(runtime::Database& db,
+               size_t nrThreads = std::thread::hardware_concurrency());
+
+std::unique_ptr<runtime::Query>
+sum_group_int_func_phmap(runtime::Database& db,
                size_t nrThreads = std::thread::hardware_concurrency());
 
 std::unique_ptr<runtime::Query>

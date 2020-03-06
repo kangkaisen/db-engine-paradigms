@@ -177,16 +177,6 @@ std::unique_ptr<Q23Builder::Q23> Q23Builder::getQuery() {
    auto lineorder = Scan("lineorder");
 
    HashGroup()
-       .addKey(Column(lineorder, "lo_orderdate"),
-               primitives::hash_int32_t_col,
-	       primitives::keys_not_equal_int32_t_col,
-               primitives::partition_by_key_int32_t_col,
-               primitives::scatter_sel_int32_t_col,
-               primitives::keys_not_equal_row_int32_t_col,
-               primitives::partition_by_key_row_int32_t_col,
-               primitives::scatter_sel_row_int32_t_col,
-               primitives::gather_val_int32_t_col,
-               Buffer(orderdate, sizeof(int32_t)))
       .addKey(Column(lineorder, "lo_shopmode"),
               primitives::hash_Char_10_col,
               primitives::keys_not_equal_Char_10_col,
@@ -197,12 +187,23 @@ std::unique_ptr<Q23Builder::Q23> Q23Builder::getQuery() {
               primitives::scatter_sel_row_Char_10_col,
               primitives::gather_val_Char_10_col,
               Buffer(shopmode, sizeof(types::Char<10>)))
+       .addKey(Column(lineorder, "lo_orderdate"),
+               primitives::rehash_int32_t_col,
+	            primitives::keys_not_equal_int32_t_col,
+               primitives::partition_by_key_int32_t_col,
+               primitives::scatter_sel_int32_t_col,
+               primitives::keys_not_equal_row_int32_t_col,
+               primitives::partition_by_key_row_int32_t_col,
+               primitives::scatter_sel_row_int32_t_col,
+               primitives::gather_val_int32_t_col,
+               Buffer(orderdate, sizeof(int32_t)))
        .addValue(Column(lineorder, "lo_revenue"),
               primitives::aggr_init_plus_int64_t_col,
               primitives::aggr_plus_int64_t_col,
               primitives::aggr_row_plus_int64_t_col,
               primitives::gather_val_int64_t_col,
               Buffer(sum_revenue, sizeof(int64_t)));
+
    result.addValue("sum_revenue", Buffer(sum_revenue))
        .addValue("orderdate", Buffer(orderdate))
        .addValue("shopmode", Buffer(shopmode))
@@ -228,8 +229,8 @@ std::unique_ptr<runtime::Query> q23_vectorwise(Database& db, size_t nrThreads,
          result = move(dynamic_cast<ResultWriter*>(query->rootOp.get())->shared.result);
    });
 
-   //    auto checkResult = [&](BlockRelation* result) {
-   //    auto lo_shopmode = result->getAttribute("lo_shopmode");
+   // auto checkResult = [&](BlockRelation* result) {
+   //    auto lo_shopmode = result->getAttribute("shopmode");
    //    auto orderdateAttr = result->getAttribute("orderdate");
    //    auto sumAttr = result->getAttribute("sum_revenue");
    //    int count = 0;

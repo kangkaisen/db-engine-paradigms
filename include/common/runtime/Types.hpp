@@ -879,7 +879,15 @@ template <> struct hash<types::Date> {
 /// Provide std::hash for Integer
 template <> struct hash<types::Integer> {
    size_t operator()(types::Integer __val) const noexcept {
-      return std::hash<int32_t>{}(__val.value);
+      //return std::hash<int32_t>{}(__val.value);
+      // size_t x = __val.value;
+      //     x ^= x >> 33;
+   //  x *= 0xff51afd7ed558ccdULL;
+   //  x ^= x >> 33;
+   //  x *= 0xc4ceb9fe1a85ec53ULL;
+   //  x ^= x >> 33;
+
+    return __val.value;
    }
 };
 /// Provide std::hash for Char

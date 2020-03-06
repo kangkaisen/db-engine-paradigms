@@ -54,34 +54,40 @@ int main(int argc, char* argv[]) {
    std::cout << "Threads is: " << nrThreads << std::endl;
 
    tbb::task_scheduler_init scheduler(nrThreads);
-   
-   e.timeAndProfile("count_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = count_hyper(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("count_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q11_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("count_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = count_hyper(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("count_if_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = count_if_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("count_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q11_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("count_if_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q12_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("count_if_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = count_if_hyper(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("sum_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("count_if_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q12_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("sum_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q13_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("sum_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_hyper(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("sum3_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum3_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("sum_func_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_func_hyper(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("sum3_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q21_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("sum_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q13_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("sum_group_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("sum3_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum3_hyper(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("sum_group_phmap ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group_phmap(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("sum3_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q21_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("sum_group_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q22_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("sum_group_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group_hyper(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("sum_group2_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group2_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("sum_group_phmap ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group_phmap(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("sum_group2_phmap ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group2_phmap(ssb, nrThreads); escape(&result);}, repetitions);
+   e.timeAndProfile("sum_group_int_phmap ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group_int_phmap(ssb, nrThreads); escape(&result);}, repetitions);
 
-   e.timeAndProfile("sum_group2_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q23_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
+   // e.timeAndProfile("sum_group_int_func_phmap ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group_int_func_phmap(ssb, nrThreads); escape(&result);}, repetitions);
+
+   // e.timeAndProfile("sum_group_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q22_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
+
+   // e.timeAndProfile("sum_group2_hyper ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group2_hyper(ssb, nrThreads); escape(&result);}, repetitions);
+
+   // e.timeAndProfile("sum_group2_phmap ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = sum_group2_phmap(ssb, nrThreads); escape(&result);}, repetitions);
+
+   // e.timeAndProfile("sum_group2_vector ", nrTuples(ssb, {"lineorder"}), [&]() { auto result = q23_vectorwise(ssb, nrThreads); escape(&result);}, repetitions);
 
    return 0;
 }
